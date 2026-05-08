@@ -305,9 +305,7 @@ def populate_dataset(
             for camera, img_array in cameras.items():
                 frame[f"observation.images.{camera}"] = img_array[i]
 
-            frame["task"] = task
-
-            dataset.add_frame(frame)
+            dataset.add_frame(frame, task=task)
         dataset.save_episode()
 
     return dataset
