@@ -22,8 +22,6 @@
 
 1.Update [`lerobot dataset v3.0`](https://github.com/huggingface/lerobot/blob/main/docs/source/porting_datasets_v3.mdx).
 
-2.More policy support([`pi05`](https://github.com/huggingface/lerobot/tree/main/src/lerobot/policies/pi05), [`groot`](https://github.com/huggingface/lerobot/tree/main/src/lerobot/policies/groot)).
-
 ### 🏷️ v0.2
 
 1.Add `data conversion` and `model deployment` for `brainco` and `inspire1` Dexterous hands.
@@ -44,7 +42,7 @@ This repository is used for `lerobot training validation`(Supports LeRobot datas
 
 | Directory  | Description                                                                                              |
 | ---------- | -------------------------------------------------------------------------------------------------------- |
-| lerobot    | The code in the `lerobot repository` for training; its corresponding commit version number is `0878c68`. |
+| lerobot    | The code in the `lerobot repository` for training; pinned at tag `v0.3.3` (commit `b883328`).            |
 | utils      | `unitree data processing tool `                                                                          |
 | eval_robot | `unitree real machine inference verification of the model`                                               |
 
@@ -98,8 +96,8 @@ import tqdm
 episode_index = 1
 dataset = LeRobotDataset(repo_id="unitreerobotics/G1_Dex3_ToastedBread_Dataset")
 
-from_idx = dataset.meta.episodes["dataset_from_index"][episode_index]
-to_idx = dataset.meta.episodes["dataset_to_index"][episode_index]
+from_idx = int(dataset.episode_data_index["from"][episode_index].item())
+to_idx = int(dataset.episode_data_index["to"][episode_index].item())
 
 for step_idx in tqdm.tqdm(range(from_idx, to_idx)):
     step = dataset[step_idx]
@@ -110,7 +108,7 @@ for step_idx in tqdm.tqdm(range(from_idx, to_idx)):
 ```bash
 cd unitree_lerobot/lerobot
 
-python src/lerobot/scripts/lerobot_dataset_viz.py \
+python src/lerobot/scripts/visualize_dataset.py \
     --repo-id unitreerobotics/G1_Dex3_ToastedBread_Dataset \
     --episode-index 0
 ```
@@ -208,7 +206,7 @@ python unitree_lerobot/utils/convert_unitree_json_to_lerobot.py \
 ```bash
 cd unitree_lerobot/lerobot
 
-python src/lerobot/scripts/lerobot_train.py \
+python src/lerobot/scripts/train.py \
     --dataset.repo_id=unitreerobotics/G1_Dex3_ToastedBread_Dataset \
     --policy.push_to_hub=false \
     --policy.type=act
@@ -219,7 +217,7 @@ python src/lerobot/scripts/lerobot_train.py \
 ```bash
 cd unitree_lerobot/lerobot
 
-python src/lerobot/scripts/lerobot_train.py\
+python src/lerobot/scripts/train.py\
     --dataset.repo_id=unitreerobotics/G1_Dex3_ToastedBread_Dataset \
     --policy.push_to_hub=false \
     --policy.type=diffusion
@@ -230,45 +228,15 @@ python src/lerobot/scripts/lerobot_train.py\
 ```bash
 cd unitree_lerobot/lerobot
 
-python src/lerobot/scripts/lerobot_train.py \
+python src/lerobot/scripts/train.py \
     --dataset.repo_id=unitreerobotics/G1_Dex3_ToastedBread_Dataset \
     --policy.push_to_hub=false \
     --policy.type=pi0
 ```
 
-- `Train Pi05 Policy` [Please refer to it in detail](https://github.com/huggingface/lerobot/blob/main/docs/source/pi05.mdx)
-
-```bash
-cd unitree_lerobot/lerobot
-
-python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_Dex3_ToastedBread_Dataset \
-    --policy.type=pi05 \
-    --output_dir=./outputs/pi05_training \
-    --job_name=pi05_training \
-    --policy.pretrained_path=lerobot/pi05_base \
-    --policy.compile_model=true \
-    --policy.gradient_checkpointing=true \
-    --policy.dtype=bfloat16 \
-    --policy.device=cuda \
-    --policy.push_to_hub=false
-```
-
-- `Train Gr00t Policy` [Please refer to it in detail](https://github.com/huggingface/lerobot/blob/main/docs/source/groot.mdx)
-
-```bash
-cd unitree_lerobot/lerobot
-
-python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_Dex3_ToastedBread_Dataset \
-    --output_dir=./outputs/groot_training \
-    --policy.push_to_hub=false \
-    --policy.type=groot \
-    --policy.tune_diffusion_model=false \
-    --job_name=groot_training
-```
-
 If you want to use multi-GPU training, please refer to the details [here](https://github.com/huggingface/lerobot/blob/main/docs/source/multi_gpu_training.mdx)
+
+> Note: `pi05` and `groot` policies are not available on the pinned `lerobot v0.3.3`. They were added in `lerobot v0.4.x`. To use them, bump the submodule to a newer tag and update the eval pipeline accordingly.
 
 # 4. 🤖 Real-World Testing
 

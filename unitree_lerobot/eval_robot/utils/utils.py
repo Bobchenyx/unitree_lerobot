@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-from typing import Any
 from contextlib import nullcontext
 from copy import copy
 import logging
@@ -8,7 +7,6 @@ from dataclasses import dataclass, field
 from lerobot.configs import parser
 from lerobot.configs.policies import PreTrainedConfig
 from lerobot.policies.pretrained import PreTrainedPolicy
-from lerobot.processor import PolicyAction, PolicyProcessorPipeline
 
 
 import logging_mp
@@ -36,12 +34,9 @@ def predict_action(
     observation: dict[str, np.ndarray],
     policy: PreTrainedPolicy,
     device: torch.device,
-    preprocessor: PolicyProcessorPipeline[dict[str, Any], dict[str, Any]],
-    postprocessor: PolicyProcessorPipeline[PolicyAction, PolicyAction],
     use_amp: bool,
     task: str | None = None,
     use_dataset: bool | None = False,
-    robot_type: str | None = None,
 ):
     observation = copy(observation)
     with (
@@ -51,7 +46,6 @@ def predict_action(
         # Convert to pytorch format: channel first and float32 in [0,1] with batch dimension
         for name in observation:
             if not use_dataset:
-                # Skip non-tensor observations (like task strings)
                 if not hasattr(observation[name], "unsqueeze"):
                     continue
                 if "images" in name:
@@ -60,21 +54,12 @@ def predict_action(
 
             observation[name] = observation[name].unsqueeze(0).to(device)
 
-        observation["task"] = task if task else ""
-        observation["robot_type"] = robot_type if robot_type else ""
+        if task is not None:
+            observation["task"] = task
 
-        observation = preprocessor(observation)
-
-        # Compute the next action with the policy
-        # based on the current observation
+        # v0.3.3 policies handle normalization internally; no separate processor pipeline.
         action = policy.select_action(observation)
-        action = postprocessor(action)
-
-        # Remove batch dimension
-        action = action.squeeze(0)
-
-        # Move to cpu, if not already the case
-        action = action.to("cpu")
+        action = action.squeeze(0).to("cpu")
 
     return action
 

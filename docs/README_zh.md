@@ -23,7 +23,7 @@
 
 | 目录       | 说明                                                   |
 | ---------- | ------------------------------------------------------ |
-| lerobot    | `lerobot` 仓库代码，其对应的 commit 版本号为 `0878c68` |
+| lerobot    | `lerobot` 仓库代码，已锁定到 tag `v0.3.3`（commit `b883328`） |
 | utils      | `unitree 数据处理工具`                                 |
 | eval_robot | `unitree 模型真机推理验证`                             |
 
@@ -75,8 +75,8 @@ import tqdm
 episode_index = 1
 dataset = LeRobotDataset(repo_id="unitreerobotics/G1_Dex3_ToastedBread_Dataset")
 
-from_idx = dataset.meta.episodes["dataset_from_index"][episode_index]
-to_idx = dataset.meta.episodes["dataset_to_index"][episode_index]
+from_idx = int(dataset.episode_data_index["from"][episode_index].item())
+to_idx = int(dataset.episode_data_index["to"][episode_index].item())
 
 for step_idx in tqdm.tqdm(range(from_idx, to_idx)):
     step = dataset[step_idx]
@@ -87,7 +87,7 @@ for step_idx in tqdm.tqdm(range(from_idx, to_idx)):
 ```bash
 cd unitree_lerobot/lerobot
 
-python src/lerobot/scripts/lerobot_dataset_viz.py \
+python src/lerobot/scripts/visualize_dataset.py \
     --repo-id unitreerobotics/G1_Dex3_ToastedBread_Dataset \
     --episode-index 0
 ```
@@ -210,39 +210,9 @@ python src/lerobot/scripts/train.py \
     --policy.type=pi0
 ```
 
-- `训练 Pi05 Policy` [Please refer to it in detail](https://github.com/huggingface/lerobot/blob/main/docs/source/pi05.mdx)
-
-```bash
-cd unitree_lerobot/lerobot
-
-python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_Dex3_ToastedBread_Dataset \
-    --policy.type=pi05 \
-    --output_dir=./outputs/pi05_training \
-    --job_name=pi05_training \
-    --policy.pretrained_path=lerobot/pi05_base \
-    --policy.compile_model=true \
-    --policy.gradient_checkpointing=true \
-    --policy.dtype=bfloat16 \
-    --policy.device=cuda \
-    --policy.push_to_hub=false
-```
-
-- `训练 Gr00t Policy` [Please refer to it in detail](https://github.com/huggingface/lerobot/blob/main/docs/source/groot.mdx)
-
-```bash
-cd unitree_lerobot/lerobot
-
-python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_Dex3_ToastedBread_Dataset \
-    --output_dir=./outputs/groot_training \
-    --policy.push_to_hub=false \
-    --policy.type=groot \
-    --policy.tune_diffusion_model=false \
-    --job_name=groot_training
-```
-
 如果你想使用多 GPU 训练，请参考 [here](https://github.com/huggingface/lerobot/blob/main/docs/source/multi_gpu_training.mdx)
+
+> 注意：`pi05` 与 `groot` 策略不在已锁定的 `lerobot v0.3.3` 版本中。它们是在 `lerobot v0.4.x` 中加入的。如需使用，请将子模块切换到更新的 tag 并相应地适配 eval 流程。
 
 # 4. 🤖 真机测试
 
