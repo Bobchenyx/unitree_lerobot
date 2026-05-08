@@ -9,6 +9,8 @@
   </p>
 </div>
 
+> **Branch `v0.3.3-convert`** — pins the `lerobot` submodule to **v0.3.3** (`b883328`) so the JSON → LeRobot conversion pipeline (`unitree_lerobot/utils/convert_unitree_json_to_lerobot.py`) keeps working against the older lerobot API. Only the conversion path is guaranteed on this branch; the eval / replay scripts and other docs in the rest of this README still target the v0.4.x API and will not run as-is until adapted. For the v0.4.x integration use `main` / `NEU-dev`.
+
 | Unitree Robotics repositories                      | link                                                                               |
 | -------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | Unitree Datasets                                   | [unitree datasets](https://huggingface.co/unitreerobotics)                         |

@@ -9,6 +9,8 @@
   </p>
 </div>
 
+> **分支 `v0.3.3-convert`** —— 将 `lerobot` 子模块锁定到 **v0.3.3**（`b883328`），保证 JSON → LeRobot 转换流水线（`unitree_lerobot/utils/convert_unitree_json_to_lerobot.py`）继续兼容旧版 lerobot API。本分支只保证转换路径可用；README 中其余 eval / replay 脚本和示例仍以 v0.4.x API 描述，未在本分支适配，原样运行不会通过。如需 v0.4.x 集成，请使用 `main` / `NEU-dev` 分支。
+
 | Unitree Robotics repositories | link                                                                            |
 | ----------------------------- | ------------------------------------------------------------------------------- |
 | Unitree Datasets              | [unitree datasets](https://huggingface.co/unitreerobotics)                      |
