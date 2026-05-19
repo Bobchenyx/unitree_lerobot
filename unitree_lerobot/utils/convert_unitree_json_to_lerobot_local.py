@@ -177,7 +177,7 @@ class JsonDataset:
         state = self._extract_data(episode_data, "states", self.json_state_data_name)
         episode_length = len(state)
         state_dim = state.shape[1] if len(state.shape) == 2 else state.shape[0]
-        action_dim = action.shape[1] if len(action.shape) == 2 else state.shape[0]
+        action_dim = action.shape[1] if len(action.shape) == 2 else action.shape[0]
 
         # Load task description
         task = episode_data.get("text", {}).get("goal", "")
@@ -301,14 +301,14 @@ def populate_dataset(
         episode_length = episode["episode_length"]
 
         num_frames = episode_length
-        for i in range(num_frames):
+        for frame_idx in range(num_frames):
             frame = {
-                "observation.state": state[i],
-                "action": action[i],
+                "observation.state": state[frame_idx],
+                "action": action[frame_idx],
             }
 
             for camera, img_array in cameras.items():
-                frame[f"observation.images.{camera}"] = img_array[i]
+                frame[f"observation.images.{camera}"] = img_array[frame_idx]
 
             dataset.add_frame(frame, task=task)
         dataset.save_episode()
